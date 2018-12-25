@@ -40,7 +40,10 @@ public class ClassCreatorProxy {
         mVariableElementMap.put(id, element);
     }
 
-
+    /**
+     * javapoet
+     * @return
+     */
     public TypeSpec generateJavaCode() {
         TypeSpec bindingClass = TypeSpec.classBuilder(mBindingClassName)
                 .addModifiers(Modifier.PUBLIC)
@@ -56,15 +59,16 @@ public class ClassCreatorProxy {
      */
     private MethodSpec generateMethods() {
         ClassName host = ClassName.bestGuess(mTypeElement.getQualifiedName().toString());
-        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("bind")
-                .addModifiers(Modifier.PUBLIC)
-                .returns(void.class)
-                .addParameter(host, "host");
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("bind") //bind方法名
+                .addModifiers(Modifier.PUBLIC) // pubilc 修饰
+                .returns(void.class) //void 修饰
+                .addParameter(host, "host"); //host参数 ，参数类型是class的全路径加名
 
         for (int id : mVariableElementMap.keySet()) {
             VariableElement element = mVariableElementMap.get(id);
-            String name = element.getSimpleName().toString();
-            String type = element.asType().toString();
+            String name = element.getSimpleName().toString();//绑定 annotation的name
+            String type = element.asType().toString(); // 绑定 annotation的数据类型
+            //拼写findviewbyid的赋值方法
             methodBuilder.addCode("host." + name + " = " + "(" + type + ")(((android.app.Activity)host).findViewById( " + id + "));");
         }
         return methodBuilder.build();
